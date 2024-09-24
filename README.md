@@ -1,4 +1,4 @@
-# simplespring
+# simplespring folder strchture
 
 src
 └── main
