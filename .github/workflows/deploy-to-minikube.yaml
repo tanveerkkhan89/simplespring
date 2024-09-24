@@ -51,16 +51,34 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
 
-      - name: Deploy to Minikube on VM
-        run: |
-          ssh -tt -o ConnectTimeout=60 ${{ secrets.VM_SSH_USER }}@${{ secrets.VM_SSH_HOST }} << 'EOF'
+      - name: Execute commands on VM using SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VM_SSH_HOST }}  # Add your VM's host IP in GitHub secrets
+          username: ${{ secrets.VM_SSH_USER }}  # Add the username in GitHub secrets
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}  # Add your SSH private key in GitHub secrets
+          port: 22  # Default SSH port
+          script: |
             cd ~/my-app/
             minikube start  # Start Minikube if not already running
-
+            
             # Apply the manifest file
             kubectl apply -f appspring-manifest.yaml
-
+            
             # Verify deployment
             kubectl get pods
             kubectl get svc
-          EOF
+
+      # - name: Deploy to Minikube on VM
+      #   run: |
+      #     ssh -tt -o ConnectTimeout=60 ${{ secrets.VM_SSH_USER }}@${{ secrets.VM_SSH_HOST }} << 'EOF'
+      #       cd ~/my-app/
+      #       minikube start  # Start Minikube if not already running
+
+      #       # Apply the manifest file
+      #       kubectl apply -f appspring-manifest.yaml
+
+      #       # Verify deployment
+      #       kubectl get pods
+      #       kubectl get svc
+      #     EOF
