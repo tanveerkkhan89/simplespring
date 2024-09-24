@@ -53,7 +53,7 @@ jobs:
 
       - name: Deploy to Minikube on VM
         run: |
-          ssh -t -o ConnectTimeout=30 ${{ secrets.VM_SSH_USER }}@${{ secrets.VM_SSH_HOST }} << 'EOF'
+          ssh -tt -o ConnectTimeout=30 ${{ secrets.VM_SSH_USER }}@${{ secrets.VM_SSH_HOST }} << 'EOF'
             cd ~/my-app/
             minikube start  # Start Minikube if not already running
 
