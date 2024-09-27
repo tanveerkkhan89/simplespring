@@ -49,26 +49,30 @@ jobs:
 
     steps:
       - name: Deploy to Minikube on VM
-        uses: appleboy/ssh-action@v0.1.10
+        uses: zhangxr/ssh-action@v1
         with:
           host: ${{ secrets.VM_SSH_HOST }}
+          # username: ${{ secrets.VM_SSH_USER }}
+          # key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
           username: ${{ secrets.VM_SSH_USER }}
-          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          password: ${{ secrets.PASSWORD }}
           port: 22
           timeout: 200s
           command_timeout: 20m
           script: |
-            cd ~/appspring/
-            minikube status || minikube start  # Start Minikube if not running
+            echo "Deploying application..."
+          # script: |
+          #   cd ~/appspring/
+          #   minikube status || minikube start  # Start Minikube if not running
             
-            # Upgrade Helm chart with the Docker image
-            helm upgrade --install appspring ./helm-chart-directory \
-              --set image.repository="${{ secrets.DOCKER_USERNAME }}/appspring" \
-              --set image.tag=latest
+          #   # Upgrade Helm chart with the Docker image
+          #   helm upgrade --install appspring ./helm-chart-directory \
+          #     --set image.repository="${{ secrets.DOCKER_USERNAME }}/appspring" \
+          #     --set image.tag=latest
 
 
-            # Verify the deployment
-            kubectl get pods
-            kubectl get svc
+          #   # Verify the deployment
+          #   kubectl get pods
+          #   kubectl get svc
 
-            debug: true
+          #   debug: true
