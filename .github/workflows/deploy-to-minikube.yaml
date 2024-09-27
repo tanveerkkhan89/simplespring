@@ -54,7 +54,7 @@ jobs:
             minikube status || minikube start  # Start Minikube if not running
             
             # Upgrade Helm chart with the Docker image
-              helm upgrade --install appspring ./helm-chart-directory \
+            helm upgrade --install appspring ./helm-chart-directory \
               --set image.repository="${{ secrets.DOCKER_USERNAME }}/appspring" \
               --set image.tag=latest
 
@@ -62,3 +62,5 @@ jobs:
             # Verify the deployment
             kubectl get pods
             kubectl get svc
+
+            debug: true
