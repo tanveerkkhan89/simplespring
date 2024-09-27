@@ -49,7 +49,7 @@ jobs:
 
     steps:
       - name: Deploy to Minikube on VM
-        uses: zhangxr/ssh-action@v1
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.VM_SSH_HOST }}
           # username: ${{ secrets.VM_SSH_USER }}
