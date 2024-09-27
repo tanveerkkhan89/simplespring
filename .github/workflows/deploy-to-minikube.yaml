@@ -30,46 +30,35 @@ jobs:
         run: mvn clean package
 
       - name: Build Docker Image
-        run: docker build -t "${{ secrets.DOCKER_USERNAME }}"/my-app:latest .
+        run: docker build -t "${{ secrets.DOCKER_USERNAME }}"/appspring:latest .
 
       - name: Push Docker Image to Docker Hub
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker push "${{ secrets.DOCKER_USERNAME }}"/my-app:latest
+          docker push "${{ secrets.DOCKER_USERNAME }}"/appspring:latest
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Deploy to Minikube on VM
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VM_SSH_HOST }}
+          username: ${{ secrets.VM_SSH_USER }}
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~/appspring/
+            minikube status || minikube start  # Start Minikube if not running
+            
+            # Upgrade Helm chart with the Docker image
+              helm upgrade --install appspring ./helm-chart-directory \
+              --set image.repository="${{ secrets.DOCKER_USERNAME }}/appspring" \
+              --set image.tag=latest
 
-      # Install kubectl
-      - name: Install kubectl
-        run: |
-          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x ./kubectl
-          sudo mv ./kubectl /usr/local/bin/kubectl
 
-      # Install Helm
-      - name: Install Helm
-        run: |
-          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-      # Set up Kubernetes cluster credentials
-      - name: Set up Kubernetes context
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
-
-      # Deploy using Helm
-      - name: Helm Deploy
-        run: |
-          helm upgrade --install my-app ./helm-chart-directory --set image.repository="${{ secrets.DOCKER_USERNAME }}/my-app" --set image.tag=latest
-          
-      # Verify deployment
-      - name: Verify Deployment
-        run: |
-          kubectl get pods
-          kubectl get svc
+            # Verify the deployment
+            kubectl get pods
+            kubectl get svc
