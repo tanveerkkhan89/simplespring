@@ -13,7 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Cache Maven dependencies to speed up builds
       - name: Cache Maven dependencies
         uses: actions/cache@v2
         with:
@@ -46,39 +45,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+      # Install kubectl
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
 
-      - name: Execute commands on VM using SSH
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.VM_SSH_HOST }}  # Add your VM's host IP in GitHub secrets
-          username: ${{ secrets.VM_SSH_USER }}  # Add the username in GitHub secrets
-          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}  # Add your SSH private key in GitHub secrets
-          port: 22  # Default SSH port
-          script: |
-            cd ~/my-app/
-            minikube start  # Start Minikube if not already running
-            
-            # Apply the manifest file
-            kubectl apply -f appspring-manifest.yaml
-            
-            # Verify deployment
-            kubectl get pods
-            kubectl get svc
+      # Install Helm
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-      # - name: Deploy to Minikube on VM
-      #   run: |
-      #     ssh -tt -o ConnectTimeout=60 ${{ secrets.VM_SSH_USER }}@${{ secrets.VM_SSH_HOST }} << 'EOF'
-      #       cd ~/my-app/
-      #       minikube start  # Start Minikube if not already running
+      # Set up Kubernetes cluster credentials
+      - name: Set up Kubernetes context
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
 
-      #       # Apply the manifest file
-      #       kubectl apply -f appspring-manifest.yaml
-
-      #       # Verify deployment
-      #       kubectl get pods
-      #       kubectl get svc
-      #     EOF
+      # Deploy using Helm
+      - name: Helm Deploy
+        run: |
+          helm upgrade --install my-app ./helm-chart-directory --set image.repository="${{ secrets.DOCKER_USERNAME }}/my-app" --set image.tag=latest
+          
+      # Verify deployment
+      - name: Verify Deployment
+        run: |
+          kubectl get pods
+          kubectl get svc
