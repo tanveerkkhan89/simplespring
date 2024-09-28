@@ -1,25 +1,50 @@
-name: remote ssh command
+name: SSH Command Execution
+
 on:
   push:
     branches:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest        
+  ssh:
+    runs-on: ubuntu-latest
 
     steps:
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.5.3
+      - name: Execute SSH Command
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh-private-key: ${{ secrets.KEY }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          script: |
+            echo "Current Date:"
+            date
 
-      - name: Execute command via SSH
-        run: ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.USERNAME }}@${{ secrets.HOST }} "date"
+
+
+# name: remote ssh command
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest        
+
+#     steps:
+
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       - name: Set up SSH agent
+#         uses: webfactory/ssh-agent@v0.5.3
+#         with:
+#           ssh-private-key: ${{ secrets.KEY }}
+
+#       - name: Execute command via SSH
+#         run: ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.USERNAME }}@${{ secrets.HOST }} "date"
 
 
     # - name: executing remote ssh commands
