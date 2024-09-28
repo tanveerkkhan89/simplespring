@@ -17,4 +17,4 @@ jobs:
         PORT: 22
         KEY: ${{ secrets.KEY }}
         command_timeout: 10m
-        script: date
+        script: whoami
