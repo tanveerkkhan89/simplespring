@@ -10,16 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Execute SSH Command
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: 22
-          script: |
-            echo "Current Date:"
-            date
+    - name: executing remote ssh commands
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        USERNAME: ${{ secrets.USERNAME }}
+        PORT: 22
+        KEY: ${{ secrets.KEY }}
+        command_timeout: 10m
+        script: whoami
 
 
 
