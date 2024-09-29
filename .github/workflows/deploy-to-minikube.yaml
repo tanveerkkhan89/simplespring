@@ -18,17 +18,18 @@ jobs:
         echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-        sudo apt-get install sshpass
+        ssh tanveer@192.168.10.134
+        # sudo apt-get install sshpass
 
-    - name: executing remote ssh commands
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.HOST }}
-        USERNAME: ${{ secrets.USERNAME }}
-        PORT: 22
-        KEY: ${{ secrets.KEY }}
-        command_timeout: 10m
-        script: whoami
-        timeout: 60s
+    # - name: executing remote ssh commands
+    #   uses: appleboy/ssh-action@v1.0.3
+    #   with:
+    #     host: ${{ secrets.HOST }}
+    #     USERNAME: ${{ secrets.USERNAME }}
+    #     PORT: 22
+    #     KEY: ${{ secrets.KEY }}
+    #     command_timeout: 10m
+    #     script: whoami
+    #     timeout: 60s
 
 
