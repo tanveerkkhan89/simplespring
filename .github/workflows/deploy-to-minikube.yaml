@@ -12,15 +12,27 @@ jobs:
     steps:
 
     - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+       ssh-private-key: ${{ secrets.KEY }}
+      # secretes: inherit
+
+    - name: SSH into remote machine
       run: |
-        # env
-        set -e
-        mkdir -p ~/.ssh
-        echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-        ssh tanveer@192.168.10.134
-        # sudo apt-get install sshpass
+       ssh-keyscan -H -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+       ssh -v tanveer@${{ secrets.HOST }}
+
+
+    # - name: Set up SSH key
+    #   run: |
+    #     # env
+    #     set -e
+    #     mkdir -p ~/.ssh
+    #     echo "${{ secrets.KEY }}" > ~/.ssh/id_rsa
+    #     chmod 600 ~/.ssh/id_rsa
+    #     ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+    #     ssh tanveer@192.168.10.134
+    #     # sudo apt-get install sshpass
 
     # - name: executing remote ssh commands
     #   uses: appleboy/ssh-action@v1.0.3
