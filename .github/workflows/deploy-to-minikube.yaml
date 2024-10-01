@@ -13,7 +13,7 @@ jobs:
 
     - name: Connect to VM
       run: |
-        ssh -o StrictHostKeyChecking=no user@192.168.10.134 echo "Connected"
+          ssh -o StrictHostKeyChecking=no tanveer@192.168.58.1 echo "Connected"
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
